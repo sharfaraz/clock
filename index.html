@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World Clock</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f4;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .clock {
+      padding: 20px;
+      background-color: #dedbdb;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      margin: 20px auto;
+      width: 100%;
+      max-width: 280px;
+      box-sizing: border-box;
+    }
+    h2 {
+      color: #333;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .datetime-input {
+      font-size: 16px;
+      font-weight: bold;
+      color: #222;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+      background-color: #bdbdbd;
+      transition: border-color 0.3s;
+    }
+    .local-time-input {
+      font-size: 16px;
+      font-weight: bold;
+      color: #222;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+      background-color: #ffffff;
+      transition: border-color 0.3s;
+    }
+    
+    .datetime-input:focus {
+      border-color: #007BFF;
+      outline: none;
+    }
+    .local-time {
+      grid-column: span 4;
+      margin-bottom: 20px;
+      padding: 20px;
+      background-color: #f9fbfd;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .local-time-input {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>World Clock</h1>
+
+  <div class="local-time  container">
+    <h2>Your Time</h2>
+    <input type="datetime-local" class="datetime-input local-time-input" id="local-time" />
+  </div>
+
+  <div class="container">
+    <div class="clock">
+      <h2>UTC Time</h2>
+      <input type="datetime-local" class="datetime-input" id="utc-time" />
+    </div>
+
+    <div class="clock">
+      <h2>New York</h2>
+      <input type="datetime-local" class="datetime-input" id="new-york-time" />
+    </div>
+
+    <div class="clock">
+      <h2>London</h2>
+      <input type="datetime-local" class="datetime-input" id="london-time" />
+    </div>
+
+    <div class="clock">
+      <h2>Tokyo</h2>
+      <input type="datetime-local" class="datetime-input" id="tokyo-time" />
+    </div>
+
+    <div class="clock">
+      <h2>Seoul</h2>
+      <input type="datetime-local" class="datetime-input" id="seoul-time" />
+    </div>
+
+    <div class="clock">
+      <h2>Chennai</h2>
+      <input type="datetime-local" class="datetime-input" id="chennai-time" />
+    </div>
+
+    <div class="clock">
+      <h2>Dubai</h2>
+      <input type="datetime-local" class="datetime-input" id="dubai-time" />
+    </div>
+
+    <div class="clock">
+      <h2>Kuwait</h2>
+      <input type="datetime-local" class="datetime-input" id="kuwait-time" />
+    </div>
+
+    <div class="clock">
+      <h2>Vancouver</h2>
+      <input type="datetime-local" class="datetime-input" id="vancouver-time" />
+    </div>
+
+    <div class="clock">
+      <h2>Dusseldorf</h2>
+      <input type="datetime-local" class="datetime-input" id="dusseldorf-time" />
+    </div>
+
+    <div class="clock">
+      <h2>Houston</h2>
+      <input type="datetime-local" class="datetime-input" id="houston-time" />
+    </div>
+
+    <div class="clock">
+      <h2>Perth</h2>
+      <input type="datetime-local" class="datetime-input" id="perth-time" />
+    </div>
+  </div>
+
+  <script>
+    // List of time zones
+    const timeZones = {
+      'utc': 'UTC',
+      'new-york': 'America/New_York',
+      'london': 'Europe/London',
+      'tokyo': 'Asia/Tokyo',
+      'seoul': 'Asia/Seoul',
+      'chennai': 'Asia/Kolkata',
+      'dubai': 'Asia/Dubai',
+      'kuwait': 'Asia/Kuwait',
+      'vancouver': 'America/Vancouver',
+      'dusseldorf': 'Europe/Berlin',
+      'houston': 'America/Chicago',
+      'perth': 'Australia/Perth',
+      'local': moment.tz.guess() // Get the local time zone of the user
+    };
+
+    // Function to update clocks based on base date and time
+    function updateClocks(baseDateTime, baseCity) {
+      const baseMoment = moment.tz(baseDateTime, timeZones[baseCity]);
+
+      for (let city in timeZones) {
+        const cityMoment = baseMoment.clone().tz(timeZones[city]);
+        const formattedDateTime = cityMoment.format('YYYY-MM-DDTHH:mm'); // 24-hour format for input field
+        document.getElementById(`${city}-time`).value = formattedDateTime;
+      }
+    }
+
+    // Event listeners to update all clocks when one is changed
+    function attachEventListeners() {
+      const cities = Object.keys(timeZones);
+
+      cities.forEach(city => {
+        document.getElementById(`${city}-time`).addEventListener('change', function() {
+          updateClocks(this.value, city);
+        });
+      });
+    }
+
+    // Function to set the initial UTC date and time values
+    function setInitialTimes() {
+      const now = moment().utc(); // Get the current time in UTC
+
+      // Set Local Time (system's local time)
+      const localTime = moment().tz(timeZones['local']).format('YYYY-MM-DDTHH:mm');
+      document.getElementById('local-time').value = localTime;
+
+      // Set UTC time
+      const utcDateTime = now.format('YYYY-MM-DDTHH:mm'); // 24-hour format for UTC
+      document.getElementById('utc-time').value = utcDateTime;
+
+      // Set other cities' times based on time differences from UTC
+      for (let city in timeZones) {
+        if (city !== 'utc' && city !== 'local') {
+          const cityTime = now.clone().tz(timeZones[city]);
+          const cityDateTime = cityTime.format('YYYY-MM-DDTHH:mm');
+          document.getElementById(`${city}-time`).value = cityDateTime;
+        }
+      }
+    }
+
+    // Set initial times and attach event listeners on page load
+    setInitialTimes();
+    attachEventListeners();
+  </script>
+
+</body>
+</html>
